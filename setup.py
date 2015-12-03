@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.1.1',
+    version='0.1.2',
 
     description='DDNS tool for domains hosted on AliYun',
     long_description=long_description,
@@ -67,7 +67,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'aliyun-ddns-ppp=aliddns.ppp:main_wrapper',
+            'aliddns-ppp=aliddns.ppp:main_wrapper',
         ],
     },
 )
