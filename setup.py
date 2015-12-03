@@ -3,7 +3,6 @@ from os import path
 
 from setuptools import setup, find_packages
 
-
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
@@ -16,7 +15,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.1.2',
+    version='0.1.3',
 
     description='DDNS tool for domains hosted on AliYun',
     long_description=long_description,
