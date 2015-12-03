@@ -15,12 +15,12 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.1.4',
+    version='0.1.5',
 
     description='DDNS tool for domains hosted on AliYun',
     long_description=long_description,
 
-    url='http://git.decentfox.com/server',
+    url='https://github.com/decentfox/aliddns',
 
     author='DecentFoX Studio',
     author_email='support@decentfox.com',
