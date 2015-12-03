@@ -5,6 +5,16 @@ from . import config
 
 
 def main():
+    """
+    This script is called with the following arguments:
+       Arg  Name                          Example
+       $1   Interface name                ppp0
+       $2   The tty                       ttyS1
+       $3   The link speed                38400
+       $4   Local IP number               12.34.56.78
+       $5   Peer  IP number               12.34.56.99
+       $6   Optional ``ipparam'' value    foo
+    """
     # noinspection PyPackageRequirements
     import aliyun.api
 
