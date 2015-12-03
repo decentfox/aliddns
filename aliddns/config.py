@@ -8,7 +8,7 @@ RRS = [u'@', u'www']
 ALIYUN_KEY_ID = ''
 ALIYUN_KEY_SECRET = ''
 
-LOG_FILE = '/var/log/aliyun-ddns.log'
+LOG_FILE = '/var/log/aliddns.log'
 LOG_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 LOG_LEVEL = logging.INFO
 
