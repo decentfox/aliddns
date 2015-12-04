@@ -1,8 +1,9 @@
 import logging
 import socket
-import StringIO
 import sys
 import time
+
+import StringIO
 
 from . import config
 
@@ -41,38 +42,41 @@ def main():
     req.TypeKeyWord = config.TYPE
 
     tries = 0
-    try:
-        tries += 1
-        for rr in config.RRS:
-            req.RRKeyWord = rr
-            records = req.getResponse()['DomainRecords']['Record']
-            if records:
-                record = records[0]
-                if record['Value'] == ip:
-                    logging.debug('%s.%s is already %s',
-                                  rr, config.DOMAIN_NAME, ip)
+    while True:
+        try:
+            tries += 1
+            for rr in config.RRS:
+                req.RRKeyWord = rr
+                records = req.getResponse()['DomainRecords']['Record']
+                if records:
+                    record = records[0]
+                    if record['Value'] == ip:
+                        logging.debug('%s.%s is already %s',
+                                      rr, config.DOMAIN_NAME, ip)
+                    else:
+                        logging.info('Updating %s.%s from %s to %s',
+                                     rr, config.DOMAIN_NAME, record['Value'],
+                                     ip)
+                        update = aliyun.api.dns.DnsUpdateDomainRecordRequest()
+                        update.RecordId = record['RecordId']
+                        update.RR = rr
+                        update.Type = config.TYPE
+                        update.Value = ip
+                        update.getResponse()
                 else:
-                    logging.info('Updating %s.%s from %s to %s',
-                                 rr, config.DOMAIN_NAME, record['Value'], ip)
-                    update = aliyun.api.dns.DnsUpdateDomainRecordRequest()
-                    update.RecordId = record['RecordId']
-                    update.RR = rr
-                    update.Type = config.TYPE
-                    update.Value = ip
-                    update.getResponse()
+                    logging.warning('No such record %s.%s, skipping for now.',
+                                    rr, config.DOMAIN_NAME)
+        except socket.error:
+            if tries < 3:
+                logging.warning(
+                    'Network issue, try again in %s second(s).',
+                    tries ** 2, exc_info=True)
+                time.sleep(tries ** 2)
             else:
-                logging.warning('No such record %s.%s, skipping for now.',
-                                rr, config.DOMAIN_NAME)
-    except socket.error:
-        if tries < 3:
-            logging.warning(
-                'Network issue, try again in %s second(s).',
-                tries ** 2, exc_info=True)
-            time.sleep(tries ** 2)
-        else:
-            logging.critical(
-                'Still no network, please set DNS manually.',
-                exc_info=True)
+                logging.critical(
+                    'Still no network, please set DNS manually.',
+                    exc_info=True)
+                break
 
     logging.info('Finished DDNS process.')
 
