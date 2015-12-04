@@ -1,5 +1,8 @@
 import logging
+import socket
+import StringIO
 import sys
+import time
 
 from . import config
 
@@ -17,6 +20,10 @@ def main():
     """
     # noinspection PyPackageRequirements
     import aliyun.api
+
+    if not sys.stdin.encoding:
+        sys.stdin = StringIO.StringIO()
+        sys.stdin.encoding = sys.getdefaultencoding()
 
     interface = sys.argv[1]
     if interface not in config.INTERFACES:
@@ -49,7 +56,20 @@ def main():
                 update.RR = rr
                 update.Type = config.TYPE
                 update.Value = ip
-                update.getResponse()
+                tries = 0
+                try:
+                    tries += 1
+                    update.getResponse()
+                except socket.error:
+                    if tries < 3:
+                        logging.warning(
+                            'Network issue, try again in %s second(s).',
+                            tries ** 2, exc_info=True)
+                        time.sleep(tries ** 2)
+                    else:
+                        logging.critical(
+                            'Still no network, please set DNS manually.',
+                            exc_info=True)
         else:
             logging.warning('No such record %s.%s, skipping for now.',
                             rr, config.DOMAIN_NAME)
