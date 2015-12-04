@@ -66,6 +66,7 @@ def main():
                 else:
                     logging.warning('No such record %s.%s, skipping for now.',
                                     rr, config.DOMAIN_NAME)
+            break
         except socket.error:
             if tries < 3:
                 logging.warning(

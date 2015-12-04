@@ -15,7 +15,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.1.8',
+    version='0.1.9',
 
     description='DDNS tool for domains hosted on AliYun',
     long_description=long_description,
