@@ -1,9 +1,10 @@
 import logging
 
 INTERFACES = ['ppp0']
-TYPE = u'A'
-DOMAIN_NAME = u'example.com'
-RRS = [u'@', u'www']
+RECORDS = [
+    (u'@', u'example.com', u'A'),
+    (u'www', u'example.com', u'A'),
+]
 
 ALIYUN_KEY_ID = ''
 ALIYUN_KEY_SECRET = ''

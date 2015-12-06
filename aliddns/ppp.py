@@ -8,6 +8,34 @@ import StringIO
 from . import config
 
 
+def _main(ip):
+    import aliyun.api
+
+    for rr, domain_name, type_ in config.RECORDS:
+        req = aliyun.api.dns.DnsDescribeDomainRecordsRequest()
+        req.TypeKeyWord = type_
+        req.DomainName = domain_name
+        req.RRKeyWord = rr
+        records = req.getResponse()['DomainRecords']['Record']
+
+        if records:
+            record = records[0]
+            if record['Value'] == ip:
+                logging.debug('%s.%s is already %s', rr, domain_name, ip)
+            else:
+                logging.info('Updating %s.%s from %s to %s',
+                             rr, domain_name, record['Value'], ip)
+                update = aliyun.api.dns.DnsUpdateDomainRecordRequest()
+                update.RecordId = record['RecordId']
+                update.RR = rr
+                update.Type = type_
+                update.Value = ip
+                update.getResponse()
+        else:
+            logging.warning('No such record %s.%s, skipping for now.',
+                            rr, domain_name)
+
+
 def main():
     """
     This script is called with the following arguments:
@@ -37,35 +65,11 @@ def main():
     # noinspection PyUnresolvedReferences
     aliyun.setDefaultAppInfo(config.ALIYUN_KEY_ID, config.ALIYUN_KEY_SECRET)
 
-    req = aliyun.api.dns.DnsDescribeDomainRecordsRequest()
-    req.DomainName = config.DOMAIN_NAME
-    req.TypeKeyWord = config.TYPE
-
     tries = 0
     while True:
         try:
             tries += 1
-            for rr in config.RRS:
-                req.RRKeyWord = rr
-                records = req.getResponse()['DomainRecords']['Record']
-                if records:
-                    record = records[0]
-                    if record['Value'] == ip:
-                        logging.debug('%s.%s is already %s',
-                                      rr, config.DOMAIN_NAME, ip)
-                    else:
-                        logging.info('Updating %s.%s from %s to %s',
-                                     rr, config.DOMAIN_NAME, record['Value'],
-                                     ip)
-                        update = aliyun.api.dns.DnsUpdateDomainRecordRequest()
-                        update.RecordId = record['RecordId']
-                        update.RR = rr
-                        update.Type = config.TYPE
-                        update.Value = ip
-                        update.getResponse()
-                else:
-                    logging.warning('No such record %s.%s, skipping for now.',
-                                    rr, config.DOMAIN_NAME)
+            _main(ip)
             break
         except socket.error:
             if tries < 3:
