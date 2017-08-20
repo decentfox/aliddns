@@ -1,3 +1,4 @@
+import json
 import logging
 import socket
 import sys
@@ -8,15 +9,16 @@ import StringIO
 from . import config
 
 
-def _main(ip):
-    import aliyun.api
+def _main(client, ip):
+    from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import *
+    from aliyunsdkalidns.request.v20150109.UpdateDomainRecordRequest import *
 
     for rr, domain_name, type_ in config.RECORDS:
-        req = aliyun.api.dns.DnsDescribeDomainRecordsRequest()
-        req.TypeKeyWord = type_
-        req.DomainName = domain_name
-        req.RRKeyWord = rr
-        records = req.getResponse()['DomainRecords']['Record']
+        req = DescribeDomainRecordsRequest()
+        req.set_TypeKeyWord(type_)
+        req.set_DomainName(domain_name)
+        req.set_RRKeyWord(rr)
+        records = json.loads(client.do_action_with_exception(req))['DomainRecords']['Record']
 
         if records:
             record = records[0]
@@ -25,12 +27,12 @@ def _main(ip):
             else:
                 logging.info('Updating %s.%s from %s to %s',
                              rr, domain_name, record['Value'], ip)
-                update = aliyun.api.dns.DnsUpdateDomainRecordRequest()
-                update.RecordId = record['RecordId']
-                update.RR = rr
-                update.Type = type_
-                update.Value = ip
-                update.getResponse()
+                update = UpdateDomainRecordRequest()
+                update.set_RecordId(record['RecordId'])
+                update.set_RR(rr)
+                update.set_Type(type_)
+                update.set_Value(ip)
+                client.do_action_with_exception(update)
         else:
             logging.warning('No such record %s.%s, skipping for now.',
                             rr, domain_name)
@@ -48,7 +50,7 @@ def main():
        $6   Optional ``ipparam'' value    foo
     """
     # noinspection PyPackageRequirements
-    import aliyun.api
+    from aliyunsdkcore.client import AcsClient
 
     if not sys.stdin.encoding:
         sys.stdin = StringIO.StringIO()
@@ -63,13 +65,13 @@ def main():
     logging.info('Detected %s IP change: %s', interface, ip)
 
     # noinspection PyUnresolvedReferences
-    aliyun.setDefaultAppInfo(config.ALIYUN_KEY_ID, config.ALIYUN_KEY_SECRET)
+    client = AcsClient(config.ALIYUN_KEY_ID, config.ALIYUN_KEY_SECRET, 'cn-beijing')
 
     tries = 0
     while True:
         try:
             tries += 1
-            _main(ip)
+            _main(client, ip)
             break
         except socket.error:
             if tries < 3:

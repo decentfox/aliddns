@@ -15,7 +15,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.2.0',
+    version='0.3.2',
 
     description='DDNS tool for domains hosted on AliYun',
     long_description=long_description,
@@ -43,7 +43,7 @@ setup(
     # namespace_packages=[],
 
     install_requires=[
-        'aliyun-python-sdk',
+        'aliyun-python-sdk-alidns==2.0.6',
     ],
 
     include_package_data=True,
