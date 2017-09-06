@@ -51,6 +51,7 @@ def main():
     """
     # noinspection PyPackageRequirements
     from aliyunsdkcore.client import AcsClient
+    from aliyunsdkcore.acs_exception.exceptions import ClientException
 
     if not sys.stdin.encoding:
         sys.stdin = StringIO.StringIO()
@@ -73,8 +74,8 @@ def main():
             tries += 1
             _main(client, ip)
             break
-        except socket.error:
-            if tries < 3:
+        except (socket.error, ClientException):
+            if tries < 4:
                 logging.warning(
                     'Network issue, try again in %s second(s).',
                     tries ** 2, exc_info=True)
